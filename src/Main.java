@@ -21,7 +21,7 @@ public class Main {
 
 
 
-    /// Va a devolver una Lista con un arreglo de String que va a contener:
+    // Va a devolver una Lista con un arreglo de String que va a contener:
     // Posicion 0: Ronda
     // Posicion 1: Fase
     // Posicion 2: Nombre equipo 1
