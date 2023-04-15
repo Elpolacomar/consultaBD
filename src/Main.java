@@ -1,25 +1,19 @@
+import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
+
+import static java.lang.Integer.parseInt;
 
 public class Main {
     public static void main(String[] args) {
-        List<String[]> resultados = leerResultados();
-        List<String[]> pronosticos = leerPronosticos();
 
-        System.out.println("Fase\tRonda\tNombre equipo 1\tNombre equipo 2\tGoles equipo 1\tGoles equipo 2");
-        for (String[] esteResultado : resultados) {
-            System.out.println(esteResultado[0] + "\t" + esteResultado[1] + "\t" + esteResultado[2] + "\t" + esteResultado[3] + "\t" + esteResultado[4] + "\t" + esteResultado[5]);
-        }
-
-        System.out.println("\n\nNombre persona\tFase\tRonda\tNombre equipo 1\tNombre equipo 2\tGanador");
-        for (String[] estepronosticos : pronosticos) {
-            System.out.println(estepronosticos[0] + "\t" + estepronosticos[1] + "\t" + estepronosticos[2] + "\t" + estepronosticos[3] + "\t" + estepronosticos[4] + "\t" + estepronosticos[5]);
-        }
+        List<Ronda> resultados = leerResultados();
+        List<Pronostico> pronosticos = leerPronosticos();
 
     }
-
-
 
     // Va a devolver una Lista con un arreglo de String que va a contener:
     // Posicion 0: Ronda
@@ -28,8 +22,8 @@ public class Main {
     // Posicion 3: Nombre equipo 2
     // Posicion 4: Goles equipo 1
     // Posicion 5: Goles equipo 2
-    public static List<String[]> leerResultados() {
-        List<String[]> resultados = new ArrayList<>();
+    public static List<Ronda> leerResultados() {
+        List<Ronda> resultados = new ArrayList<>();
 
         // Cargamos el Driver
         try {
@@ -44,7 +38,7 @@ public class Main {
                     "jdbc:mysql://sql10.freemysqlhosting.net:3306/sql10612293",
                     "sql10612293", "ACwUKDKvbY");
             Statement stmt = con.createStatement();
-
+            List<Partido> partidosRonda = new ArrayList<>();
             // El Query que vamos a correr
             ResultSet rs = stmt.executeQuery("SELECT FASE, RONDA, E1.EQUIPO AS EQUIPO_1, E2.EQUIPO AS EQUIPO_2, GOLES_1, GOLES_2 FROM RESULTADOS R JOIN EQUIPOS E1 on R.ID_EQUIPO_1 = E1.ID_EQUIPO JOIN EQUIPOS E2 on R.ID_EQUIPO_2 = E2.ID_EQUIPO");
             while (rs.next()) {
@@ -55,15 +49,17 @@ public class Main {
                 fila[3] = rs.getString("EQUIPO_2");
                 fila[4] = rs.getString("GOLES_1");
                 fila[5] = rs.getString("GOLES_2");
-                resultados.add(fila);
+                Partido partido = new Partido(fila[0],fila[1],fila[2],fila[3],fila[4],fila[5]);
+                partidosRonda.add(partido);
+                System.out.println(partido);
             }
             con.close();
         } catch (SQLException e) {
             System.out.println("Error con SQL");
         }
-
         return resultados;
     }
+
 
     // Va a devolver una Lista con un arreglo de String que va a contener:
     // Posicion 0: Nombre de la persona
@@ -72,8 +68,8 @@ public class Main {
     // Posicion 3: Nombre equipo 1
     // Posicion 4: Nombre equipo 2
     // Posicion 5: Ganador
-    public static List<String[]> leerPronosticos() {
-        List<String[]> pronosticos = new ArrayList<>();
+    public static List<Pronostico> leerPronosticos() {
+        List<Pronostico> pronosticos = new ArrayList<>();
 
         // Cargamos el Driver
         try {
@@ -88,7 +84,7 @@ public class Main {
                     "jdbc:mysql://sql10.freemysqlhosting.net:3306/sql10612293",
                     "sql10612293", "ACwUKDKvbY");
             Statement stmt = con.createStatement();
-
+            List<Pronostico> pronosticoPartido = new ArrayList<>();
             // El Query que vamos a correr
             ResultSet rs = stmt.executeQuery("SELECT NOMBRE, FASE, RONDA, E1.EQUIPO AS EQUIPO_1, E2.EQUIPO AS EQUIPO_2, GANADOR FROM PRONOSTICOS P JOIN RESULTADOS R on P.ID_RESULTADO = R.ID_RESULTADO JOIN EQUIPOS E1 on R.ID_EQUIPO_1 = E1.ID_EQUIPO JOIN EQUIPOS E2 on R.ID_EQUIPO_2 = E2.ID_EQUIPO");
             while (rs.next()) {
@@ -99,13 +95,15 @@ public class Main {
                 fila[3] = rs.getString("EQUIPO_1");
                 fila[4] = rs.getString("EQUIPO_2");
                 fila[5] = rs.getString("GANADOR");
-                pronosticos.add(fila);
+                Pronostico pronostico;
+                pronostico = new Pronostico(fila[0], fila[1], fila[2], fila[3], fila[4], fila[5]);
+                pronosticoPartido.add(pronostico);
+                System.out.println(pronostico);
             }
             con.close();
         } catch (SQLException e) {
             System.out.println("Error con SQL");
         }
-
         return pronosticos;
     }
 }
